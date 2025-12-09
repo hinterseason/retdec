@@ -98,7 +98,7 @@ class ProgramOptions
 				else if (c == "-f")
 				{
 					std::string file_path = getParamOrDie(argc, argv, i);
-					code = read_all_bytes();
+					code = read_all_bytes(file_path);
 				}
 				else if (c == "-t")
 				{
