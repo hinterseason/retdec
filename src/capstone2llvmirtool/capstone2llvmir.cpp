@@ -24,7 +24,28 @@ using namespace retdec::utils::io;
 
 // byte ptr [0x12345678], 0x11
 std::vector<uint8_t> CODE = retdec::utils::hexStringToBytes("80 05 78 56 34 12 11 00");
+std::vector<uint8_t> read_all_bytes(const std::string& filepath) {
+    std::ifstream file(filepath, std::ios::binary);
 
+    if (!file.is_open()) {
+        std::cerr << "Error: Failed to open file at path: " << filepath << std::endl;
+        return {}; // 返回空 vector
+    }
+
+    std::vector<uint8_t> buffer(
+        (std::istreambuf_iterator<char>(file)),
+        std::istreambuf_iterator<char>()
+    );
+
+    // 3. 检查读取是否成功
+    if (file.fail() && !file.eof()) {
+        
+        std::cerr << "Error: An unknown error occurred while reading the file." << std::endl;
+        return {};
+    }
+
+    return buffer;
+}
 class ProgramOptions
 {
 	public:
@@ -73,6 +94,11 @@ class ProgramOptions
 				{
 					_code = getParamOrDie(argc, argv, i);
 					code = retdec::utils::hexStringToBytes(_code);
+				}
+				else if (c == "-f")
+				{
+					std::string file_path = getParamOrDie(argc, argv, i);
+					code = read_all_bytes();
 				}
 				else if (c == "-t")
 				{
@@ -202,7 +228,6 @@ class ProgramOptions
 
 			exit(0);
 		}
-
 	public:
 		cs_arch arch = CS_ARCH_X86;
 		uint64_t base = 0x1000;
