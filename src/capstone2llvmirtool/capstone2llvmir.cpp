@@ -46,6 +46,31 @@ std::vector<uint8_t> read_all_bytes(const std::string& filepath) {
 
     return buffer;
 }
+std::string read_all_text(const std::string& filepath) {
+    // 以文本模式打开文件
+    // 注意：默认情况下，std::ifstream 就是以文本模式打开的。
+    std::ifstream file(filepath); 
+
+    if (!file.is_open()) {
+        std::cerr << "Error: Failed to open file at path: " << filepath << std::endl;
+        return ""; // 返回空字符串
+    }
+
+    // 使用 std::stringstream/std::stringbuf 或 std::istreambuf_iterator 读取所有内容
+    // 方案 1: 使用 std::istreambuf_iterator (通常更高效)
+    std::string content(
+        (std::istreambuf_iterator<char>(file)),
+        std::istreambuf_iterator<char>()
+    );
+
+    // 检查读取是否成功
+    if (file.fail() && !file.eof()) {
+        std::cerr << "Error: An unknown error occurred while reading the file." << std::endl;
+        return "";
+    }
+
+    return content;
+}
 class ProgramOptions
 {
 	public:
@@ -98,7 +123,7 @@ class ProgramOptions
 				else if (c == "-f")
 				{
 					std::string file_path = getParamOrDie(argc, argv, i);
-					text = read_all_bytes(file_path);
+					text = read_all_text(file_path);
 				}
 				else if (c == "-t")
 				{
